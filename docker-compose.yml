@@ -1,0 +1,34 @@
+services:
+  openclaw:
+    build: .
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - API_KEY=${API_KEY}
+      - LLM_BASE_URL=${LLM_BASE_URL}
+      - LLM_MODEL=${LLM_MODEL}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_USER_ID=${TELEGRAM_USER_ID}
+      - SSH_AUTHORIZED_KEYS=${SSH_AUTHORIZED_KEYS}
+      - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY}
+      - TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-manny-openclaw}
+    volumes:
+      - openclaw-data:/home/node/.openclaw
+      - tailscale-state:/var/lib/tailscale
+    ports:
+      - "18789:18789"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+volumes:
+  openclaw-data:
+  tailscale-state:
